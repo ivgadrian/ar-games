@@ -28,8 +28,11 @@
             opacity: 0;
         }
     </style>
-    <!-- ✅ Load MediaPipe -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+  
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
@@ -52,13 +55,12 @@
         }
 
         // ✅ Correct way to use MediaPipe Selfie Segmentation
-        const selfieSegmentation = new SelfieSegmentation.SelfieSegmentation({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
-        });
+        const selfieSegmentation = new SelfieSegmentation({locateFile: (file) => {
+  return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
+}});
 
         selfieSegmentation.setOptions({
             modelSelection: 1, // 0 = General, 1 = Landscape
-            selfieMode: true
         });
 
         selfieSegmentation.onResults((results) => {
