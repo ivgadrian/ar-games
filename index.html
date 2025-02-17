@@ -28,14 +28,14 @@
             opacity: 0;
         }
     </style>
+    <!-- ✅ Load MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation"></script>
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
 
-    <script type="module">
-        import { SelfieSegmentation } from "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation";
-
+    <script>
         const video = document.getElementById("video");
         const canvas = document.getElementById("canvas");
         const ctx = canvas.getContext("2d");
@@ -51,19 +51,20 @@
             };
         }
 
-        // Load MediaPipe Selfie Segmentation
-        const selfieSegmentation = new SelfieSegmentation({locateFile: (file) =>
-            `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+        // ✅ Correct way to use MediaPipe Selfie Segmentation
+        const selfieSegmentation = new SelfieSegmentation.SelfieSegmentation({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
         });
 
         selfieSegmentation.setOptions({
             modelSelection: 1, // 0 = General, 1 = Landscape
+            selfieMode: true
         });
 
         selfieSegmentation.onResults((results) => {
             ctx.drawImage(results.segmentationMask, 0, 0, canvas.width, canvas.height);
 
-            // Remove detected foreground (person) and replace with background blur
+            // Remove detected foreground (person) and replace with transparent or blur
             ctx.globalCompositeOperation = "source-in";
             ctx.fillStyle = "rgba(0, 0, 0, 0)"; // Transparent
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -73,7 +74,7 @@
         });
 
         function processFrame() {
-            selfieSegmentation.send({image: video});
+            selfieSegmentation.send({ image: video });
             requestAnimationFrame(processFrame);
         }
 
