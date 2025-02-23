@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,73 +15,36 @@
             margin: 0;
             flex-direction: column;
         }
-        video, canvas {
+
+        video,
+        canvas {
             position: absolute;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
+
         #canvas {
             z-index: 2;
+            display: none;
         }
+        #canvas2 {
+            z-index: 2;
+        }
+
         #video {
             z-index: 1;
             opacity: 0;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
-  
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+    <script type="module" src="./main.js" crossorigin="anonymous"></script>
 </head>
+
 <body>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-
-    <script>
-        const video = document.getElementById("video");
-        const canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
-
-        // Initialize Camera Feed
-        async function startCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            video.onloadeddata = () => {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                processFrame();
-            };
-        }
-
-        // ✅ Correct way to use MediaPipe Selfie Segmentation
-        const selfieSegmentation = new SelfieSegmentation({locateFile: (file) => {
-  return `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`;
-}});
-
-        selfieSegmentation.setOptions({
-            modelSelection: 1, // 0 = General, 1 = Landscape
-        });
-
-        selfieSegmentation.onResults((results) => {
-            ctx.drawImage(results.segmentationMask, 0, 0, canvas.width, canvas.height);
-
-            // Remove detected foreground (person) and replace with transparent or blur
-            ctx.globalCompositeOperation = "source-in";
-            ctx.fillStyle = "rgba(0, 0, 0, 0)"; // Transparent
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.globalCompositeOperation = "destination-atop";
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        });
-
-        function processFrame() {
-            selfieSegmentation.send({ image: video });
-            requestAnimationFrame(processFrame);
-        }
-
-        startCamera();
-    </script>
+    <video id="video" autoplay playsinline  ></video>
+    <canvas id="canvas2" ></canvas>
+    <canvas id="canvas" ></canvas>
 </body>
+
 </html>
